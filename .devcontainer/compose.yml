@@ -1,0 +1,18 @@
+services:
+  nextjs:
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
+      GIT_USER_NAME: ${GIT_USER_NAME}
+      GIT_USER_EMAIL: ${GIT_USER_EMAIL}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace:cached
+    ports:
+      - "3000:3000"
+    stop_signal: SIGINT
+    stdin_open: true
+    tty: true

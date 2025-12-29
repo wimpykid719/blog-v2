@@ -1,0 +1,38 @@
+{
+  "name": "Next.js Dev",
+  "dockerComposeFile": "compose.yml",
+  "service": "nextjs",
+  "workspaceFolder": "/workspace",
+  "onCreateCommand": {
+    "setup-git": "git config --global user.name \"$GIT_USER_NAME\" && git config --global user.email \"$GIT_USER_EMAIL\""
+  },
+  "postCreateCommand": "chmod +x .devcontainer/entrypoint.sh && .devcontainer/entrypoint.sh",
+  "customizations": {
+    "vscode": {
+      "settings": {
+		    "editor.defaultFormatter": "biomejs.biome",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.biome": "explicit",
+          "source.organizeImports.biome": "explicit"
+        },
+        "editor.indentSize": 2,
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.formatOnSave": true,
+        "biome.lsp.bin": "/workspace/app/node_modules/.bin/biome",
+        "biome.requireConfiguration": true,
+        "biome.configurationPath": "/workspace/app/biome.json",
+        "biome.lsp.trace.server": "verbose"
+      },
+      "extensions": [
+        "biomejs.biome",
+        "bradlc.vscode-tailwindcss",
+        "eamodio.gitlens",
+        "shardulm94.trailing-spaces"
+      ]
+    }
+  },
+  "forwardPorts": [3000],
+  "remoteUser": "appuser"
+}
