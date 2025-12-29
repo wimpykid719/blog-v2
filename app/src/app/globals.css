@@ -24,3 +24,42 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes ripple-delayed {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-ripple-delayed {
+  animation: ripple-delayed 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 0.5s;
+}
