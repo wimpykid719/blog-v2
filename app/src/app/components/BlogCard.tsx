@@ -27,9 +27,6 @@ export async function BlogCard() {
       className="group block bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-gray-900/50 p-6 relative overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
       aria-label="技術ブログの記事一覧へ"
     >
-      {/* ホバー用の薄いハイライト */}
-      <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-linear-to-br from-emerald-50/70 via-transparent to-transparent dark:from-emerald-900/10" />
-
       {/* タグ */}
       <div className="absolute top-4 right-4 bg-[#118ab2]/30 dark:bg-[#118ab2]/20 px-3 h-4 rounded-xl flex items-center">
         <span className="text-[#118ab2] dark:text-[#4dd0e1] text-[10px] font-bold">
