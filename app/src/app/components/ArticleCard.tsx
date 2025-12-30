@@ -11,10 +11,14 @@ export function ArticleCard({ article }: ArticleCardProps) {
   // プラットフォームバッジの色を決定（topicsから推測、またはデフォルト）
   const getPlatformBadge = () => {
     // ここではデフォルトでZennとしますが、frontmatterにplatformフィールドを追加することも可能
+    if (frontMatter.qiitaId) {
+      return {
+        label: "Qiita",
+      };
+    }
+
     return {
       label: "Zenn",
-      bgColor: "bg-green-100 dark:bg-green-900/30",
-      textColor: "text-green-700 dark:text-green-300",
     };
   };
 

@@ -5,6 +5,7 @@ export interface ArticleFrontMatter {
   topics: string[];
   published: boolean;
   date: string;
+  qiitaId?: string;
 }
 
 export interface Article {
@@ -12,5 +13,3 @@ export interface Article {
   frontMatter: ArticleFrontMatter;
   content: string;
 }
-
-
