@@ -1,0 +1,26 @@
+{
+  "site": {
+    "name": "DevSpot",
+    "description": "Wordpressを使用しないNext.jsを使用したweb制作・受託をしています。簡易的なアプリの開発も行っています。お気軽にご相談お願いします。",
+    "url": ""
+  },
+  "author": {
+    "name": "大学生だった.",
+    "age": 30,
+    "projectsCount": 5,
+    "bio": "開発・運用・保守のお仕事を探しています。1万社が利用する業務管理システム開発に携わっていました。"
+  },
+  "platforms": {
+    "zenn": {
+      "userName": "unemployed"
+    },
+    "qiita": {
+      "userName": "Unemployed_jp"
+    }
+  },
+  "social": {
+    "x": "https://x.com/Unemployed_jp",
+    "github": "https://github.com/Unemployed-jp",
+    "website": ""
+  }
+}

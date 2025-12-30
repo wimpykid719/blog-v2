@@ -28,7 +28,7 @@ export function Header({ maxWidth = "md" }: HeaderProps) {
             </div>
           </Link>
           <div className="flex items-center gap-3">
-            <button type="button" className="p-1">
+            <button type="button" className="p-1" aria-label="メニュー">
               <div className="flex flex-col gap-1">
                 <div className="w-0.5 h-0.5 bg-gray-900 dark:bg-gray-100 rounded-full" />
                 <div className="w-0.5 h-0.5 bg-gray-900 dark:bg-gray-100 rounded-full" />

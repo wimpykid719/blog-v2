@@ -19,6 +19,21 @@ function MarkdownImage({ src, alt }: { src: string; alt?: string }) {
   // デスクトップでも「本文と同じ横幅」で自然に表示されるようにする。
   const [aspectRatio, setAspectRatio] = React.useState<string>("16 / 9");
 
+  const computedAlt = React.useMemo(() => {
+    const a = typeof alt === "string" ? alt.trim() : "";
+    if (a) return a;
+    // alt未指定をゼロにしないため、URL末尾のファイル名を人間向けに推測して使う
+    try {
+      const last = src.split("?")[0]?.split("#")[0]?.split("/").pop() || "";
+      const decoded = decodeURIComponent(last);
+      const noExt = decoded.replace(/\.[a-z0-9]+$/i, "");
+      const normalized = noExt.replace(/[-_]+/g, " ").trim();
+      return normalized || "画像";
+    } catch {
+      return "画像";
+    }
+  }, [alt, src]);
+
   return (
     <span
       className="relative block w-full my-4 rounded-lg overflow-hidden markdown-image-wrapper bg-gray-100 dark:bg-gray-800"
@@ -26,7 +41,7 @@ function MarkdownImage({ src, alt }: { src: string; alt?: string }) {
     >
       <Image
         src={src}
-        alt={alt || ""}
+        alt={computedAlt}
         fill
         sizes="(max-width: 768px) 100vw, 896px"
         className="object-contain rounded-lg"

@@ -3,6 +3,16 @@ import { Header } from "@/components/Header";
 import Pagination from "@/components/Pagination";
 import { ArticlesContainer } from "./_container/Container";
 import { getAllArticleIndex } from "./_utils/fetcher/markdown";
+import type { Metadata } from "next";
+import { getAppPageUrl } from "@/utils/seo";
+
+export const metadata: Metadata = {
+  title: "記事一覧",
+  description: "技術記事の一覧です。",
+  alternates: {
+    canonical: getAppPageUrl("/articles"),
+  },
+};
 
 const PAGE_SIZE = 30;
 
