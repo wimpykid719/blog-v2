@@ -24,6 +24,15 @@ type GithubBlogConfig = {
   token?: string;
 };
 
+function computeArticleSlug(
+  fileSlug: string,
+  frontMatter: ArticleFrontMatter,
+): string {
+  const qiitaId =
+    typeof frontMatter.qiitaId === "string" ? frontMatter.qiitaId.trim() : "";
+  return qiitaId || fileSlug;
+}
+
 function encodeGithubPath(p: string): string {
   return p
     .split("/")
@@ -186,7 +195,20 @@ async function getGithubMarkdownFileContent(
   return null;
 }
 
-async function getAllArticleIndexUncached(): Promise<ArticleIndexItem[]> {
+type ArticleIndexItemInternal = ArticleIndexItem & {
+  source: "github" | "local";
+  /**
+   * GitHubの場合は contents API で参照できる path（例: "articles/foo.md"）。
+   * ローカルの場合は絶対パス。
+   */
+  filePath: string;
+  /** GitHub記事の場合のみ */
+  repo?: GithubRepoRef;
+};
+
+async function getAllArticleIndexInternalUncached(): Promise<
+  ArticleIndexItemInternal[]
+> {
   const github = getGithubBlogConfig();
   if (github) {
     try {
@@ -200,7 +222,7 @@ async function getAllArticleIndexUncached(): Promise<ArticleIndexItem[]> {
           >(url.toString(), github.token);
           if (!res.ok) {
             // リポジトリ単位で失敗しても全体は壊さない
-            return [] as ArticleIndexItem[];
+            return [] as ArticleIndexItemInternal[];
           }
 
           const entries = Array.isArray(res.data) ? res.data : [];
@@ -210,7 +232,7 @@ async function getAllArticleIndexUncached(): Promise<ArticleIndexItem[]> {
 
           const items = await Promise.all(
             markdownFiles.map(async (f) => {
-              const slug = f.name.replace(/\.md$/i, "");
+              const fileSlug = f.name.replace(/\.md$/i, "");
               const content = await getGithubMarkdownFileContent(
                 github,
                 repo,
@@ -218,19 +240,24 @@ async function getAllArticleIndexUncached(): Promise<ArticleIndexItem[]> {
               );
               if (!content) return null;
               const { data } = parseMarkdown(content);
+              const frontMatter = data as ArticleFrontMatter;
+              const slug = computeArticleSlug(fileSlug, frontMatter);
               return {
                 slug,
-                frontMatter: data as ArticleFrontMatter,
-              } satisfies ArticleIndexItem;
+                frontMatter,
+                source: "github",
+                filePath: f.path,
+                repo,
+              } satisfies ArticleIndexItemInternal;
             }),
           );
 
-          return items.filter((a): a is ArticleIndexItem => Boolean(a));
+          return items.filter((a): a is NonNullable<typeof a> => Boolean(a));
         }),
       );
 
       // slug衝突は、GITHUB_REPOS の指定順で先勝ち（routeが一意である必要があるため）
-      const deduped = new Map<string, ArticleIndexItem>();
+      const deduped = new Map<string, ArticleIndexItemInternal>();
       for (const a of perRepo.flat()) {
         if (!deduped.has(a.slug)) deduped.set(a.slug, a);
       }
@@ -261,15 +288,19 @@ async function getAllArticleIndexUncached(): Promise<ArticleIndexItem[]> {
   const items = fileNames
     .filter((fileName) => fileName.endsWith(".md"))
     .map((fileName) => {
-      const slug = fileName.replace(/\.md$/, "");
+      const fileSlug = fileName.replace(/\.md$/, "");
       const fullPath = path.join(articlesDirectory, fileName);
       const fileContents = fs.readFileSync(fullPath, "utf8");
       const { data } = parseMarkdown(fileContents);
+      const frontMatter = data as ArticleFrontMatter;
+      const slug = computeArticleSlug(fileSlug, frontMatter);
 
       return {
         slug,
-        frontMatter: data as ArticleFrontMatter,
-      } satisfies ArticleIndexItem;
+        frontMatter,
+        source: "local",
+        filePath: fullPath,
+      } satisfies ArticleIndexItemInternal;
     })
     .filter((article) => article.frontMatter.published) // publishedがtrueのもののみ
     .sort((a, b) => {
@@ -283,8 +314,8 @@ async function getAllArticleIndexUncached(): Promise<ArticleIndexItem[]> {
   return items;
 }
 
-const getAllArticleIndexCached = cache(async () => {
-  return await getAllArticleIndexUncached();
+const getAllArticleIndexInternalCached = cache(async () => {
+  return await getAllArticleIndexInternalUncached();
 });
 
 /**
@@ -292,7 +323,8 @@ const getAllArticleIndexCached = cache(async () => {
  * - ホームの「新着/総数」や記事一覧で使用（本文を読み出して保持しない）
  */
 export async function getAllArticleIndex(): Promise<ArticleIndexItem[]> {
-  return await getAllArticleIndexCached();
+  const internal = await getAllArticleIndexInternalCached();
+  return internal.map((a) => ({ slug: a.slug, frontMatter: a.frontMatter }));
 }
 
 export async function getAllArticles(): Promise<Article[]> {
@@ -305,9 +337,14 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
   const github = getGithubBlogConfig();
   if (github) {
     try {
-      const filePath = `${github.articlesPath}/${slug}.md`;
+      // 1) 従来互換: slug=ファイル名 のケース（最速パス）
+      const directFilePath = `${github.articlesPath}/${slug}.md`;
       for (const repo of github.repos) {
-        const raw = await getGithubMarkdownFileContent(github, repo, filePath);
+        const raw = await getGithubMarkdownFileContent(
+          github,
+          repo,
+          directFilePath,
+        );
         if (!raw) continue;
 
         const { data, content } = parseMarkdown(raw);
@@ -318,6 +355,25 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
         };
       }
 
+      // 2) Qiita対応: slug=qiitaId のケース。indexから元ファイルを逆引きする
+      const index = await getAllArticleIndexInternalCached();
+      const hit = index.find((a) => a.source === "github" && a.slug === slug);
+      if (hit?.repo) {
+        const raw = await getGithubMarkdownFileContent(
+          github,
+          hit.repo,
+          hit.filePath,
+        );
+        if (raw) {
+          const { data, content } = parseMarkdown(raw);
+          return {
+            slug,
+            frontMatter: data as ArticleFrontMatter,
+            content,
+          };
+        }
+      }
+
       return null;
     } catch {
       return null;
@@ -326,19 +382,34 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 
   // --- ローカルフォールバック（従来挙動） ---
   const articlesDirectory = path.join(process.cwd(), "content/articles");
-  const filePath = path.join(articlesDirectory, `${slug}.md`);
+  const directFilePath = path.join(articlesDirectory, `${slug}.md`);
 
   // ファイルが存在しない場合はnullを返す
-  if (!fs.existsSync(filePath)) {
-    return null;
+  if (fs.existsSync(directFilePath)) {
+    const fileContents = fs.readFileSync(directFilePath, "utf8");
+    const { data, content } = parseMarkdown(fileContents);
+
+    return {
+      slug,
+      frontMatter: data as ArticleFrontMatter,
+      content,
+    };
   }
 
-  const fileContents = fs.readFileSync(filePath, "utf8");
-  const { data, content } = parseMarkdown(fileContents);
+  // Qiita対応: slug=qiitaId のケース。indexから元ファイルを逆引きする
+  try {
+    const index = await getAllArticleIndexInternalCached();
+    const hit = index.find((a) => a.source === "local" && a.slug === slug);
+    if (!hit) return null;
+    const fileContents = fs.readFileSync(hit.filePath, "utf8");
+    const { data, content } = parseMarkdown(fileContents);
 
-  return {
-    slug,
-    frontMatter: data as ArticleFrontMatter,
-    content,
-  };
+    return {
+      slug,
+      frontMatter: data as ArticleFrontMatter,
+      content,
+    };
+  } catch {
+    return null;
+  }
 }
