@@ -66,6 +66,10 @@ export function buildArticleDescription(article: Article): string | undefined {
 export function buildDefaultMetadata(): Metadata {
   const cfg = getSiteConfig();
   const base = getSiteUrl();
+  const googleSiteVerification =
+    typeof process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION === "string"
+      ? process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION.trim()
+      : "";
 
   return {
     metadataBase: base,
@@ -74,6 +78,9 @@ export function buildDefaultMetadata(): Metadata {
       template: `%s | ${cfg.site.name}`,
     },
     description: cfg.site.description,
+    ...(googleSiteVerification
+      ? { verification: { google: googleSiteVerification } }
+      : {}),
     openGraph: {
       type: "website",
       siteName: cfg.site.name,
