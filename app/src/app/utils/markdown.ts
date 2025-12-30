@@ -41,3 +41,22 @@ export function getAllArticles(): Article[] {
 
   return articles;
 }
+
+export function getArticleBySlug(slug: string): Article | null {
+  const articlesDirectory = path.join(process.cwd(), "content/articles");
+  const filePath = path.join(articlesDirectory, `${slug}.md`);
+
+  // ファイルが存在しない場合はnullを返す
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+
+  const fileContents = fs.readFileSync(filePath, "utf8");
+  const { data, content } = parseMarkdown(fileContents);
+
+  return {
+    slug,
+    frontMatter: data as ArticleFrontMatter,
+    content,
+  };
+}

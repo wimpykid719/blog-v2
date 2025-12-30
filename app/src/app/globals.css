@@ -163,3 +163,21 @@ body {
     box-shadow: var(--shadow-pagination);
   }
 }
+
+/* コードブロックのダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  .hljs {
+    background: #1e1e1e !important;
+    color: #d4d4d4 !important;
+  }
+}
+
+/* KaTeXのダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  .katex {
+    color: #e5e5e5;
+  }
+  .katex .base {
+    color: #e5e5e5;
+  }
+}
