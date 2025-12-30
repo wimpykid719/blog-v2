@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 declare global {
   interface Window {
@@ -38,7 +38,7 @@ function trackPageView(args: { pathname: string; search: string }): void {
   }
 }
 
-export function GoogleAnalytics() {
+function GoogleAnalyticsTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const search = searchParams?.toString() ?? "";
@@ -47,6 +47,10 @@ export function GoogleAnalytics() {
     trackPageView({ pathname, search });
   }, [pathname, search]);
 
+  return null;
+}
+
+function GoogleAnalyticsScripts() {
   if (!GA4_MEASUREMENT_ID) return null;
 
   return (
@@ -64,6 +68,17 @@ export function GoogleAnalytics() {
           gtag('config', '${GA4_MEASUREMENT_ID}', { send_page_view: false });
         `}
       </Script>
+    </>
+  );
+}
+
+export function GoogleAnalytics() {
+  return (
+    <>
+      <GoogleAnalyticsScripts />
+      <Suspense fallback={null}>
+        <GoogleAnalyticsTracker />
+      </Suspense>
     </>
   );
 }
