@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import React from "react";
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
@@ -11,6 +12,34 @@ import remarkMath from "remark-math";
 
 interface MarkdownContentProps {
   content: string;
+}
+
+function MarkdownImage({ src, alt }: { src: string; alt?: string }) {
+  // 初期表示は 16:9 を仮に使い、読み込み後に実画像の縦横比へ更新して
+  // デスクトップでも「本文と同じ横幅」で自然に表示されるようにする。
+  const [aspectRatio, setAspectRatio] = React.useState<string>("16 / 9");
+
+  return (
+    <span
+      className="relative block w-full my-4 rounded-lg overflow-hidden markdown-image-wrapper bg-gray-100 dark:bg-gray-800"
+      style={{ aspectRatio }}
+    >
+      <Image
+        src={src}
+        alt={alt || ""}
+        fill
+        sizes="(max-width: 768px) 100vw, 896px"
+        className="object-contain rounded-lg"
+        unoptimized
+        onLoad={(event) => {
+          const img = event.currentTarget;
+          if (img?.naturalWidth && img?.naturalHeight) {
+            setAspectRatio(`${img.naturalWidth} / ${img.naturalHeight}`);
+          }
+        }}
+      />
+    </span>
+  );
 }
 
 export function MarkdownContent({ content }: MarkdownContentProps) {
@@ -67,7 +96,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
               </div>
             </div>
             {/* コード部分 */}
-            <pre className="m-0 p-4 overflow-x-auto bg-gray-50 dark:bg-gray-900">
+            <pre className="m-0 overflow-x-auto bg-gray-50 dark:bg-gray-900">
               <code className={className} {...props}>
                 {children}
               </code>
@@ -105,11 +134,64 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
         {children}
       </h4>
     ),
-    p: ({ children }) => (
-      <p className="mb-4 leading-7 text-gray-700 dark:text-gray-300">
-        {children}
-      </p>
-    ),
+    p: ({ children }) => {
+      // 子要素にdiv要素やmarkdown-image-wrapperクラスが含まれている場合は、<p>の代わりに<div>を使用
+      // (imgコンポーネントが<div>を返すため、<p>の中に<div>を配置できない)
+      const checkForBlockElement = (child: React.ReactNode): boolean => {
+        if (!React.isValidElement(child)) return false;
+
+        // 文字列の"div"型をチェック
+        if (child.type === "div") return true;
+
+        // propsからclassNameをチェック
+        const props = child.props;
+        if (props && typeof props === "object") {
+          // classNameがmarkdown-image-wrapperを含むかチェック
+          if (
+            "className" in props &&
+            typeof props.className === "string" &&
+            props.className.includes("markdown-image-wrapper")
+          ) {
+            return true;
+          }
+
+          // childrenを再帰的にチェック
+          if (
+            "children" in props &&
+            props.children &&
+            (typeof props.children === "object" ||
+              typeof props.children === "string" ||
+              typeof props.children === "number")
+          ) {
+            const childrenArray = React.Children.toArray(
+              props.children as React.ReactNode,
+            );
+            if (childrenArray.some(checkForBlockElement)) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      };
+
+      const hasBlockElement =
+        React.Children.toArray(children).some(checkForBlockElement);
+
+      if (hasBlockElement) {
+        return (
+          <div className="mb-4 leading-7 text-gray-700 dark:text-gray-300">
+            {children}
+          </div>
+        );
+      }
+
+      return (
+        <p className="mb-4 leading-7 text-gray-700 dark:text-gray-300">
+          {children}
+        </p>
+      );
+    },
     ul: ({ children }) => (
       <ul className="mb-4 ml-6 list-disc space-y-2 text-gray-700 dark:text-gray-300">
         {children}
@@ -120,7 +202,9 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
         {children}
       </ol>
     ),
-    li: ({ children }) => <li className="leading-7">{children}</li>,
+    li: ({ children }) => (
+      <li className="leading-7 wrap-break-word">{children}</li>
+    ),
     blockquote: ({ children }) => (
       <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-4 italic text-gray-600 dark:text-gray-400">
         {children}
@@ -129,7 +213,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
     a: ({ href, children }) => (
       <a
         href={href}
-        className="text-blue-600 dark:text-blue-400 hover:underline"
+        className="text-blue-600 dark:text-blue-400 hover:underline wrap-break-word"
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -165,18 +249,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
     hr: () => <hr className="my-8 border-gray-300 dark:border-gray-600" />,
     img: ({ src, alt }) => {
       if (!src || typeof src !== "string") return null;
-      return (
-        <div className="relative w-full min-h-[200px] my-4 rounded-lg overflow-hidden">
-          <Image
-            src={src}
-            alt={alt || ""}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 800px, 800px"
-            className="object-contain rounded-lg"
-            unoptimized
-          />
-        </div>
-      );
+      return <MarkdownImage src={src} alt={alt} />;
     },
   };
 

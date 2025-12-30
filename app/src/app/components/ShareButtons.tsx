@@ -26,7 +26,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
       <button
         type="button"
         onClick={() => handleShare("x")}
-        className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:opacity-80 transition-opacity cursor-pointer"
         aria-label="Xでシェア"
       >
         <svg
@@ -43,7 +43,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
       <button
         type="button"
         onClick={() => handleShare("hatena")}
-        className="flex items-center gap-2 px-4 py-2 bg-[#00A4DE] text-white rounded-lg hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2 px-4 py-2 bg-[#00A4DE] text-white rounded-lg hover:opacity-80 transition-opacity cursor-pointer"
         aria-label="はてなブックマークでシェア"
       >
         <svg
@@ -60,7 +60,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
       <button
         type="button"
         onClick={() => handleShare("line")}
-        className="flex items-center gap-2 px-4 py-2 bg-[#00C300] text-white rounded-lg hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2 px-4 py-2 bg-[#00C300] text-white rounded-lg hover:opacity-80 transition-opacity cursor-pointer"
         aria-label="LINEでシェア"
       >
         <svg
@@ -77,7 +77,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
       <button
         type="button"
         onClick={() => handleShare("facebook")}
-        className="flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white rounded-lg hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white rounded-lg hover:opacity-80 transition-opacity cursor-pointer"
         aria-label="Facebookでシェア"
       >
         <svg
@@ -94,7 +94,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
       <button
         type="button"
         onClick={() => handleShare("threads")}
-        className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:opacity-80 transition-opacity cursor-pointer"
         aria-label="Threadsでシェア"
       >
         <svg

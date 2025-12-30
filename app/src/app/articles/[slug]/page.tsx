@@ -1,9 +1,9 @@
-import { notFound } from "next/navigation";
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { Header } from "../../components/Header";
-import { ShareButtons } from "../../components/ShareButtons";
 import { MarkdownContent } from "../../components/MarkdownContent";
-import { getArticleBySlug } from "../../utils/markdown";
+import { ShareButtons } from "../../components/ShareButtons";
+import { getAllArticles, getArticleBySlug } from "../../utils/markdown";
 
 interface ArticlePageProps {
   params: Promise<{
@@ -24,8 +24,11 @@ async function getCurrentUrl(slug: string): Promise<string> {
       protocol = headersList.get("x-forwarded-proto") || protocol;
     } else {
       // 環境変数から取得を試みる
-      host = process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, "") || host;
-      protocol = process.env.NEXT_PUBLIC_SITE_URL?.startsWith("https") ? "https" : protocol;
+      host =
+        process.env.NEXT_PUBLIC_SITE_URL?.replace(/^https?:\/\//, "") || host;
+      protocol = process.env.NEXT_PUBLIC_SITE_URL?.startsWith("https")
+        ? "https"
+        : protocol;
     }
 
     return `${protocol}://${host}/articles/${slug}`;
@@ -38,8 +41,7 @@ async function getCurrentUrl(slug: string): Promise<string> {
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
-
+  const article = await getArticleBySlug(slug);
   if (!article) {
     notFound();
   }
@@ -90,3 +92,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   );
 }
 
+export async function generateStaticParams() {
+  const articles = await getAllArticles();
+  return articles.map((a) => ({ slug: a.slug }));
+}

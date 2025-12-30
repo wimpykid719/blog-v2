@@ -25,6 +25,16 @@ Before starting the container, copy the sample environment file:
 ```zsh
 cp .devcontainer/.env.sample .devcontainer/.env
 ```
+
+### Blog content (Markdown) from GitHub
+This project can generate `/articles` pages from Markdown files stored in GitHub repositories.
+
+Set the following variables in `.devcontainer/.env` (copy from `.devcontainer/.env.sample` first):
+- `GITHUB_REPOS` (required; recommended format is like `owner/repo-a,owner/repo-b`)
+- `GITHUB_OWNER` (required; use for repo path)
+- `GITHUB_BLOG_PATH` (optional, default: `articles`)
+- `GITHUB_TOKEN` (optional but recommended; required for private repos)
+
 ### 3. Open in Dev Container
 Open the project in VS Code and run "Reopen in Container" to initialize the development environment.
 All necessary tools (pnpm, Biome, Tailwind, etc.) are already preinstalled.

@@ -3,8 +3,8 @@ import { Header } from "../components/Header";
 import Pagination, { INITIAL_PAGE } from "../components/Pagination";
 import { getAllArticles } from "../utils/markdown";
 
-export default function ArticlesPage() {
-  const articles = getAllArticles();
+export default async function ArticlesPage() {
+  const articles = await getAllArticles();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12">
@@ -25,8 +25,7 @@ export default function ArticlesPage() {
         {articles.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">
-              記事がまだありません。content/articles/
-              ディレクトリにマークダウンファイルを追加してください。
+              記事がまだありません。
             </p>
           </div>
         ) : (

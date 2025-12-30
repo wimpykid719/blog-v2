@@ -4,6 +4,10 @@ services:
       COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
       GIT_USER_NAME: ${GIT_USER_NAME}
       GIT_USER_EMAIL: ${GIT_USER_EMAIL}
+      GITHUB_REPOS: ${GITHUB_REPOS}
+      GITHUB_OWNER: ${GITHUB_OWNER}
+      GITHUB_BLOG_PATH: ${GITHUB_BLOG_PATH}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
     build:
       context: .
       dockerfile: Dockerfile

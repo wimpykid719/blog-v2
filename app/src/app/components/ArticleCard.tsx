@@ -67,11 +67,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             {frontMatter.topics.map((topic) => (
               <span
                 key={topic}
-                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                style={{
-                  backgroundColor: "#F5F5F5",
-                  color: "#757575",
-                }}
+                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
               >
                 #{topic}
               </span>
