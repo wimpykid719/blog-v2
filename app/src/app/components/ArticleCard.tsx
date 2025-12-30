@@ -33,7 +33,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
       };
     } else if (label === "Qiita") {
       return {
-        backgroundColor: "#E8F5E9",
+        backgroundColor: "var(--color-green-light)",
         color: "#2E7D32",
       };
     } else {
