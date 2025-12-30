@@ -1,10 +1,36 @@
 @import "tailwindcss";
+@tailwind utilities;
 
 @variant dark (@media (prefers-color-scheme: dark));
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* カラースキーマ */
+  --color-primary-red: #ef476f;
+  --color-primary-yellow: #ffd166;
+  --color-primary-green: #06d6a0;
+  --color-primary-blue: #118ab2;
+  --color-primary-dark: #073b4c;
+  /* RGB形式のカラー（影で使用） */
+  /* NOTE: `rgb(R G B / A)` 構文に合わせて「空白区切り」にする（カンマ区切りだと無効になりやすい） */
+  --color-primary-blue-rgb: 17 138 178;
+  /* 影の定義 */
+  /* Natural, modern layered shadow (neutral + subtle brand ambient) */
+  --shadow-pagination:
+    0 1px 2px rgb(0 0 0 / 0.06), 0 2px 6px rgb(0 0 0 / 0.1), 0 4px 8px
+    rgb(var(--color-primary-blue-rgb) / 0.1);
+  /* 透過率を調整した色 */
+  --color-red-light: rgba(239, 71, 111, 0.1);
+  --color-red-medium: rgba(239, 71, 111, 0.3);
+  --color-yellow-light: rgba(255, 209, 102, 0.1);
+  --color-yellow-medium: rgba(255, 209, 102, 0.3);
+  --color-green-light: rgba(6, 214, 160, 0.1);
+  --color-green-medium: rgba(6, 214, 160, 0.3);
+  --color-blue-light: rgba(17, 138, 178, 0.1);
+  --color-blue-medium: rgba(17, 138, 178, 0.3);
+  --color-dark-light: rgba(7, 59, 76, 0.1);
+  --color-dark-medium: rgba(7, 59, 76, 0.3);
 }
 
 @theme inline {
@@ -12,12 +38,39 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* カラーパレット */
+  --color-primary-red: var(--color-primary-red);
+  --color-primary-yellow: var(--color-primary-yellow);
+  --color-primary-green: var(--color-primary-green);
+  --color-primary-blue: var(--color-primary-blue);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-primary: var(--color-primary-blue);
+  /* 影の定義 */
+  /* Natural, modern layered shadow (neutral + subtle brand ambient) */
+  --shadow-pagination:
+    0 1px 2px rgb(0 0 0 / 0.06), 0 10px 24px rgb(0 0 0 / 0.1), 0 10px 28px
+    rgb(var(--color-primary-blue-rgb) / 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    /* ダークモード用の透過色 */
+    --color-red-light: rgba(239, 71, 111, 0.2);
+    --color-red-medium: rgba(239, 71, 111, 0.4);
+    --color-yellow-light: rgba(255, 209, 102, 0.2);
+    --color-yellow-medium: rgba(255, 209, 102, 0.4);
+    --color-green-light: rgba(6, 214, 160, 0.2);
+    --color-green-medium: rgba(6, 214, 160, 0.4);
+    --color-blue-light: rgba(17, 138, 178, 0.2);
+    --color-blue-medium: rgba(17, 138, 178, 0.4);
+    --color-dark-light: rgba(7, 59, 76, 0.2);
+    --color-dark-medium: rgba(7, 59, 76, 0.4);
+    /* ダークモードでは“沈む”ので、影は少し強め + 上面ハイライトを足して自然に見せる */
+    --shadow-pagination:
+      0 1px 0 rgb(255 255 255 / 0.06), 0 10px 26px rgb(0 0 0 / 0.45), 0 10px
+      30px rgb(var(--color-primary-blue-rgb) / 0.16);
   }
 }
 
@@ -64,4 +117,49 @@ body {
 .animate-ripple-delayed {
   animation: ripple-delayed 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   animation-delay: 0.5s;
+}
+
+/* カテゴリフィルターボタンのホバー効果 */
+.filter-btn-all {
+  background-color: #06d6a0;
+}
+
+.filter-btn-all:hover {
+  background-color: #05c18f;
+}
+
+.filter-btn-frontend {
+  background-color: var(--color-blue-light);
+  color: #118ab2;
+}
+
+.filter-btn-frontend:hover {
+  background-color: var(--color-blue-medium);
+}
+
+.filter-btn-backend {
+  background-color: var(--color-red-light);
+  color: #ef476f;
+}
+
+.filter-btn-backend:hover {
+  background-color: var(--color-red-medium);
+}
+
+.filter-btn-design {
+  background-color: var(--color-yellow-light);
+  color: #ffd166;
+}
+
+.filter-btn-design:hover {
+  background-color: var(--color-yellow-medium);
+}
+
+@layer utilities {
+  .sub-text-color {
+    @apply text-gray-50 dark:text-gray-900;
+  }
+  .shadow-pagination {
+    box-shadow: var(--shadow-pagination);
+  }
 }
