@@ -1,6 +1,13 @@
+import {
+  getAllArticleIndex,
+  getArticleBySlug,
+} from "@/app/articles/_utils/fetcher/markdown";
 import { getSiteConfig, getSiteUrl } from "@/config/site";
-import { getAllArticleIndex, getArticleBySlug } from "@/app/articles/_utils/fetcher/markdown";
-import { buildArticleDescription, getAppPageUrl, getCanonicalSourceUrl } from "@/utils/seo";
+import {
+  buildArticleDescription,
+  getAppPageUrl,
+  getCanonicalSourceUrl,
+} from "@/utils/seo";
 
 export const revalidate = 60;
 
@@ -46,7 +53,9 @@ export async function GET() {
         getCanonicalSourceUrl({ slug, frontMatter: idx.frontMatter }) ?? appUrl;
 
       const article = await getArticleBySlug(slug);
-      const description = article ? buildArticleDescription(article) : undefined;
+      const description = article
+        ? buildArticleDescription(article)
+        : undefined;
 
       const dt = parseFrontMatterDate(idx.frontMatter.date);
       const pubDate = dt ? dt.toUTCString() : undefined;
@@ -65,7 +74,9 @@ export async function GET() {
         `<link>${escapeXml(canonicalSource)}</link>`,
         `<guid isPermaLink="true">${escapeXml(guid)}</guid>`,
         pubDate ? `<pubDate>${escapeXml(pubDate)}</pubDate>` : "",
-        description ? `<description>${escapeXml(description)}</description>` : "",
+        description
+          ? `<description>${escapeXml(description)}</description>`
+          : "",
         ...categories.map((c) => `<category>${escapeXml(c)}</category>`),
         "</item>",
       ]
@@ -91,9 +102,8 @@ export async function GET() {
     status: 200,
     headers: {
       "Content-Type": "application/rss+xml; charset=utf-8",
-      "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=600",
+      "Cache-Control":
+        "public, max-age=0, s-maxage=60, stale-while-revalidate=600",
     },
   });
 }
-
-
