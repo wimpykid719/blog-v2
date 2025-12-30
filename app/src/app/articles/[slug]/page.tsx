@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Header } from "../../components/Header";
 import { MarkdownContent } from "../../components/MarkdownContent";
 import { ShareButtons } from "../../components/ShareButtons";
-import { getAllArticles, getArticleBySlug } from "../../utils/markdown";
+import { getAllArticleIndex, getArticleBySlug } from "../../utils/markdown";
 
 interface ArticlePageProps {
   params: Promise<{
@@ -32,7 +32,7 @@ async function getCurrentUrl(slug: string): Promise<string> {
     }
 
     return `${protocol}://${host}/articles/${slug}`;
-  } catch (error) {
+  } catch {
     // フォールバック: 環境変数またはデフォルト値を使用
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     return `${baseUrl}/articles/${slug}`;
@@ -93,6 +93,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 }
 
 export async function generateStaticParams() {
-  const articles = await getAllArticles();
-  return articles.map((a) => ({ slug: a.slug }));
+  const index = await getAllArticleIndex();
+  return index.map((a) => ({ slug: a.slug }));
 }

@@ -1,11 +1,17 @@
 import fs from "fs";
 import matter from "gray-matter";
 import path from "path";
+import { cache } from "react";
 import type { Article, ArticleFrontMatter } from "../types/article";
 
 export function parseMarkdown(content: string) {
   return matter(content);
 }
+
+export type ArticleIndexItem = {
+  slug: string;
+  frontMatter: ArticleFrontMatter;
+};
 
 type GithubRepoRef = {
   owner: string;
@@ -180,7 +186,7 @@ async function getGithubMarkdownFileContent(
   return null;
 }
 
-export async function getAllArticles(): Promise<Article[]> {
+async function getAllArticleIndexUncached(): Promise<ArticleIndexItem[]> {
   const github = getGithubBlogConfig();
   if (github) {
     try {
@@ -194,7 +200,7 @@ export async function getAllArticles(): Promise<Article[]> {
           >(url.toString(), github.token);
           if (!res.ok) {
             // リポジトリ単位で失敗しても全体は壊さない
-            return [] as Article[];
+            return [] as ArticleIndexItem[];
           }
 
           const entries = Array.isArray(res.data) ? res.data : [];
@@ -202,7 +208,7 @@ export async function getAllArticles(): Promise<Article[]> {
             (e) => e.type === "file" && e.name.toLowerCase().endsWith(".md"),
           );
 
-          const articles = await Promise.all(
+          const items = await Promise.all(
             markdownFiles.map(async (f) => {
               const slug = f.name.replace(/\.md$/i, "");
               const content = await getGithubMarkdownFileContent(
@@ -211,21 +217,20 @@ export async function getAllArticles(): Promise<Article[]> {
                 f.path,
               );
               if (!content) return null;
-              const { data, content: body } = parseMarkdown(content);
+              const { data } = parseMarkdown(content);
               return {
                 slug,
                 frontMatter: data as ArticleFrontMatter,
-                content: body,
-              } satisfies Article;
+              } satisfies ArticleIndexItem;
             }),
           );
 
-          return articles.filter((a): a is Article => Boolean(a));
+          return items.filter((a): a is ArticleIndexItem => Boolean(a));
         }),
       );
 
       // slug衝突は、GITHUB_REPOS の指定順で先勝ち（routeが一意である必要があるため）
-      const deduped = new Map<string, Article>();
+      const deduped = new Map<string, ArticleIndexItem>();
       for (const a of perRepo.flat()) {
         if (!deduped.has(a.slug)) deduped.set(a.slug, a);
       }
@@ -253,19 +258,18 @@ export async function getAllArticles(): Promise<Article[]> {
   }
 
   const fileNames = fs.readdirSync(articlesDirectory);
-  const articles = fileNames
+  const items = fileNames
     .filter((fileName) => fileName.endsWith(".md"))
     .map((fileName) => {
       const slug = fileName.replace(/\.md$/, "");
       const fullPath = path.join(articlesDirectory, fileName);
       const fileContents = fs.readFileSync(fullPath, "utf8");
-      const { data, content } = parseMarkdown(fileContents);
+      const { data } = parseMarkdown(fileContents);
 
       return {
         slug,
         frontMatter: data as ArticleFrontMatter,
-        content,
-      };
+      } satisfies ArticleIndexItem;
     })
     .filter((article) => article.frontMatter.published) // publishedがtrueのもののみ
     .sort((a, b) => {
@@ -276,7 +280,25 @@ export async function getAllArticles(): Promise<Article[]> {
       );
     });
 
-  return articles;
+  return items;
+}
+
+const getAllArticleIndexCached = cache(async () => {
+  return await getAllArticleIndexUncached();
+});
+
+/**
+ * 記事一覧で必要な最小データ（slug + frontMatter）のみを返す軽量版。
+ * - ホームの「新着/総数」や記事一覧で使用（本文を読み出して保持しない）
+ */
+export async function getAllArticleIndex(): Promise<ArticleIndexItem[]> {
+  return await getAllArticleIndexCached();
+}
+
+export async function getAllArticles(): Promise<Article[]> {
+  // 互換のため Article[] を返すが、一覧用途では本文は不要なので空文字にする
+  const index = await getAllArticleIndex();
+  return index.map((a) => ({ ...a, content: "" }));
 }
 
 export async function getArticleBySlug(slug: string): Promise<Article | null> {

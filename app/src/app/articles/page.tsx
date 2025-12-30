@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { ArticleCard } from "../components/ArticleCard";
 import { Header } from "../components/Header";
 import Pagination from "../components/Pagination";
-import { getAllArticles } from "../utils/markdown";
+import { getAllArticleIndex } from "../utils/markdown";
 
 const PAGE_SIZE = 30;
 
@@ -32,13 +32,13 @@ function parsePageParam(
 export default async function ArticlesPage({
   searchParams,
 }: ArticlesPageProps) {
-  const articles = await getAllArticles();
-  const lastPage = Math.max(1, Math.ceil(articles.length / PAGE_SIZE));
+  const index = await getAllArticleIndex();
+  const lastPage = Math.max(1, Math.ceil(index.length / PAGE_SIZE));
   const currentPage = parsePageParam((await searchParams)?.page, lastPage);
   if (currentPage === null) {
     notFound();
   }
-  const pagedArticles = articles.slice(
+  const pagedIndex = index.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE,
   );
@@ -59,7 +59,7 @@ export default async function ArticlesPage({
 
       {/* 記事グリッド */}
       <section className="max-w-6xl mx-auto px-6">
-        {articles.length === 0 ? (
+        {index.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">
               記事がまだありません。
@@ -67,15 +67,15 @@ export default async function ArticlesPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pagedArticles.map((article) => (
-              <ArticleCard key={article.slug} article={article} />
+            {pagedIndex.map((item) => (
+              <ArticleCard key={item.slug} article={{ ...item, content: "" }} />
             ))}
           </div>
         )}
       </section>
 
       {/* ページネーション */}
-      {articles.length > 0 && (
+      {index.length > 0 && (
         <section className="max-w-6xl mx-auto px-6 mt-12">
           <Pagination
             path="/articles?page="
