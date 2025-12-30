@@ -1,10 +1,47 @@
+import { notFound } from "next/navigation";
 import { ArticleCard } from "../components/ArticleCard";
 import { Header } from "../components/Header";
-import Pagination, { INITIAL_PAGE } from "../components/Pagination";
+import Pagination from "../components/Pagination";
 import { getAllArticles } from "../utils/markdown";
 
-export default async function ArticlesPage() {
+const PAGE_SIZE = 30;
+
+type ArticlesPageProps = {
+  searchParams?: Promise<{
+    page?: string | string[];
+  }>;
+};
+
+function parsePageParam(
+  pageParam: string | string[] | undefined,
+  lastPage: number,
+): number | null {
+  const raw = Array.isArray(pageParam) ? pageParam[0] : pageParam;
+  const value = raw ?? "1";
+
+  // 数値として不正（空、整数以外、0以下）は404
+  if (!/^\d+$/.test(value)) return null;
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return null;
+
+  // 範囲外は404
+  if (parsed > Math.max(lastPage, 1)) return null;
+  return parsed;
+}
+
+export default async function ArticlesPage({
+  searchParams,
+}: ArticlesPageProps) {
   const articles = await getAllArticles();
+  const lastPage = Math.max(1, Math.ceil(articles.length / PAGE_SIZE));
+  const currentPage = parsePageParam((await searchParams)?.page, lastPage);
+  if (currentPage === null) {
+    notFound();
+  }
+  const pagedArticles = articles.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12">
@@ -30,7 +67,7 @@ export default async function ArticlesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.map((article) => (
+            {pagedArticles.map((article) => (
               <ArticleCard key={article.slug} article={article} />
             ))}
           </div>
@@ -40,7 +77,12 @@ export default async function ArticlesPage() {
       {/* ページネーション */}
       {articles.length > 0 && (
         <section className="max-w-6xl mx-auto px-6 mt-12">
-          <Pagination page={INITIAL_PAGE} lastPage={3} siblingCount={2} />
+          <Pagination
+            path="/articles?page="
+            page={currentPage}
+            lastPage={lastPage}
+            siblingCount={2}
+          />
         </section>
       )}
     </div>
