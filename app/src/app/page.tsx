@@ -1,7 +1,5 @@
-import { AutoSnakeGame } from "./components/AutoSnakeGame";
-import { BlogCard } from "./components/BlogCard";
-import { Header } from "./components/Header";
-import { ProfileCard } from "./components/ProfileCard";
+import { Header } from "@/components/Header";
+import { HomeContainer } from "./_container/Container";
 
 export default function Home() {
   return (
@@ -10,16 +8,7 @@ export default function Home() {
 
       {/* メインコンテンツ */}
       <main className="max-w-md mx-auto px-6 mt-8">
-        {/* 自動操縦スネークゲーム */}
-        <div className="mb-8">
-          <AutoSnakeGame />
-        </div>
-
-        {/* カードセクション */}
-        <div className="space-y-6">
-          <ProfileCard />
-          <BlogCard />
-        </div>
+        <HomeContainer />
       </main>
     </div>
   );

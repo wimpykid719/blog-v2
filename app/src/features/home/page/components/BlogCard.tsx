@@ -1,6 +1,6 @@
 import { FileText } from "lucide-react";
 import Link from "next/link";
-import { getAllArticleIndex } from "../utils/markdown";
+import { getAllArticleIndex } from "@/app/articles/_utils/fetcher/markdown";
 
 function getCutoffDate(): Date {
   const d = new Date();

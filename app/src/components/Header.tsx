@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { NotificationBadge } from "./NotificationBadge";
+import { NotificationBadge } from "@/components/NotificationBadge";
 
 interface HeaderProps {
   maxWidth?: "md" | "6xl";

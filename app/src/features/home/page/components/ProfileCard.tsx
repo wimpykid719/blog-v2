@@ -1,7 +1,7 @@
 "use client";
 
 import { Building, Globe, User } from "lucide-react";
-import svgPaths from "../../imports/svg-vlysciruhp";
+import svgPaths from "@/imports/svg-vlysciruhp";
 
 export function ProfileCard() {
   return (

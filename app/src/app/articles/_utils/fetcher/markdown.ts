@@ -2,7 +2,7 @@ import fs from "fs";
 import matter from "gray-matter";
 import path from "path";
 import { cache } from "react";
-import type { Article, ArticleFrontMatter } from "../types/article";
+import type { Article, ArticleFrontMatter } from "@/types/article";
 
 export function parseMarkdown(content: string) {
   return matter(content);

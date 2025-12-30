@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeviceWindow } from "../../hooks/useDeviceWindow";
+import { useDeviceWindow } from "@/hooks/useDeviceWindow";
 import Base, { type PaginationProps } from "./Base";
 
 type ResponsiblePagination = {

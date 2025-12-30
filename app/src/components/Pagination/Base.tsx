@@ -1,6 +1,6 @@
 "use client";
 
-import { range } from "../../utils/range";
+import { range } from "@/utils/range";
 import Ellipsis from "./Ellipsis";
 import Navigation from "./Navigation";
 import NumberComponent from "./Number";
