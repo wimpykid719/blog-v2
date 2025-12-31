@@ -1,4 +1,4 @@
-# DevSpot Blog (Next.js)
+# 🏡 DevSpot Blog (Next.js)
 
 **English** | [日本語](./README.md)
 
