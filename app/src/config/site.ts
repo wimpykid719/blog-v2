@@ -26,6 +26,7 @@ export type SiteConfig = {
     github: string;
     website: string;
   };
+  skills: string[];
 };
 
 function trimTrailingSlash(url: string): string {

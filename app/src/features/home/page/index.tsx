@@ -1,6 +1,7 @@
 import { AutoSnakeGame } from "./components/AutoSnakeGame";
 import { BlogCard } from "./components/BlogCard";
 import { ProfileCard } from "./components/ProfileCard";
+import { SkillsCard } from "./components/SkillsCard";
 
 export function HomePage() {
   return (
@@ -13,9 +14,9 @@ export function HomePage() {
       {/* カードセクション */}
       <div className="space-y-6">
         <ProfileCard />
+        <SkillsCard />
         <BlogCard />
       </div>
     </>
   );
 }
-
