@@ -23,14 +23,18 @@ export function ProfileCard() {
       </h2>
 
       {/* メタ情報 */}
-      <div className="flex items-center gap-4 mb-4 text-xs text-gray-500 dark:text-gray-400">
-        <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-2 mb-4 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-1 whitespace-nowrap">
           <User className="w-3 h-3" />
           <span>{author.age}歳</span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 whitespace-nowrap">
           <Building className="w-3 h-3" />
           <span>こなした案件数 {author.projectsCount}件</span>
+        </div>
+        <div className="flex items-center gap-1 whitespace-nowrap">
+          <span className="text-xs">¥</span>
+          <span>稼働単価 {author.hourlyRate} 円</span>
         </div>
       </div>
 

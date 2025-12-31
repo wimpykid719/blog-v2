@@ -14,6 +14,7 @@ export type SiteConfig = {
     name: string;
     age: number;
     projectsCount: number;
+    hourlyRate: string;
     bio: string;
   };
   platforms: {
