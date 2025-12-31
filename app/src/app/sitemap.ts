@@ -2,12 +2,6 @@ import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/config/site";
 import { getAllArticleIndex } from "./articles/_utils/fetcher/markdown";
 
-// Google / GSC からの取得を安定させるため、可能な限り静的・キャッシュ前提で配信する。
-// - 実データは記事一覧（GitHub/ローカル）に依存するため、適度に再検証する
-export const revalidate = 60 * 60; // 1 hour
-export const runtime = "nodejs";
-export const dynamic = "force-static";
-
 function parseFrontMatterDate(input: string | undefined | null): Date | null {
   const raw = (input || "").trim();
   if (!raw) return null;
