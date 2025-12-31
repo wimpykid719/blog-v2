@@ -1,6 +1,30 @@
 import type { MetadataRoute } from "next";
-import { getAllArticleIndex } from "./articles/_utils/fetcher/markdown";
 import { getSiteUrl } from "@/config/site";
+import { getAllArticleIndex } from "./articles/_utils/fetcher/markdown";
+
+// Google / GSC からの取得を安定させるため、可能な限り静的・キャッシュ前提で配信する。
+// - 実データは記事一覧（GitHub/ローカル）に依存するため、適度に再検証する
+export const revalidate = 60 * 60; // 1 hour
+export const runtime = "nodejs";
+export const dynamic = "force-static";
+
+function parseFrontMatterDate(input: string | undefined | null): Date | null {
+  const raw = (input || "").trim();
+  if (!raw) return null;
+
+  // YYYY.MM.DD / YYYY-MM-DD / YYYY/MM/DD を許容（環境依存の Date パースを避ける）
+  const m = raw.match(/^(\d{4})[./-](\d{1,2})[./-](\d{1,2})$/);
+  if (m) {
+    const y = Number(m[1]);
+    const mo = Number(m[2]);
+    const d = Number(m[3]);
+    const dt = new Date(Date.UTC(y, mo - 1, d, 0, 0, 0));
+    return Number.isFinite(dt.getTime()) ? dt : null;
+  }
+
+  const dt = new Date(raw);
+  return Number.isFinite(dt.getTime()) ? dt : null;
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = getSiteUrl().toString().replace(/\/+$/, "");
@@ -17,14 +41,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const articleUrls: MetadataRoute.Sitemap = index.map((a) => {
-    const lastModified = new Date(a.frontMatter.date);
+    const lastModified = parseFrontMatterDate(a.frontMatter.date);
     return {
       url: `${base}/articles/${encodeURIComponent(a.slug)}`,
-      ...(Number.isFinite(lastModified.getTime()) ? { lastModified } : {}),
+      ...(lastModified ? { lastModified } : {}),
     };
   });
 
   return [...staticUrls, ...articleUrls];
 }
-
-
