@@ -2,6 +2,10 @@ import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/config/site";
 import { getAllArticleIndex } from "./articles/_utils/fetcher/markdown";
 
+// `getAllArticleIndex()` が `fs` を使用するため、Edge runtime だと落ちる。
+// Sitemap は Node.js runtime で確実に生成する。
+export const runtime = "nodejs";
+
 function parseFrontMatterDate(input: string | undefined | null): Date | null {
   const raw = (input || "").trim();
   if (!raw) return null;

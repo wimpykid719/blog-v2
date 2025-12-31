@@ -9,6 +9,8 @@ import {
   getCanonicalSourceUrl,
 } from "@/utils/seo";
 
+// `getAllArticleIndex()` / `getArticleBySlug()` が `fs` を使用するため Node.js runtime 固定
+export const runtime = "nodejs";
 export const revalidate = 60;
 
 function escapeXml(s: string): string {
