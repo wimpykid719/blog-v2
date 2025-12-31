@@ -1,11 +1,11 @@
-import { Header } from "@/components/Header";
-import { HomeContainer } from "./_container/Container";
 import type { Metadata } from "next";
-import { getAppPageUrl } from "@/utils/seo";
+import { Header } from "@/components/Header";
 import { getSiteConfig } from "@/config/site";
+import { getAppPageUrl } from "@/utils/seo";
+import { HomeContainer } from "./_container/Container";
 
 export const metadata: Metadata = {
-  title: "ホーム",
+  title: getSiteConfig().site.name,
   description: getSiteConfig().site.description,
   alternates: {
     canonical: getAppPageUrl("/"),
