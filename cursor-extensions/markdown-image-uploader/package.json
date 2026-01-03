@@ -1,0 +1,137 @@
+{
+  "name": "markdown-image-uploader",
+  "displayName": "Markdown Image Uploader",
+  "description": "Paste an image file path in Markdown, upload to Firebase Storage, and insert a public Markdown image link.",
+  "version": "0.1.0",
+  "publisher": "local",
+  "private": true,
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "markdownImageUploader.paste",
+        "title": "Markdown: Paste Image (Upload to Firebase Storage)"
+      },
+      {
+        "command": "markdownImageUploader.openLogs",
+        "title": "Markdown Image Uploader: Open Logs"
+      }
+    ],
+    "configuration": {
+      "title": "Markdown Image Uploader",
+      "properties": {
+        "markdownImageUploader.uploadRootFolder": {
+          "type": "string",
+          "default": "blog-images",
+          "description": "Firebase Storage object path root folder (e.g. 'blog-images'). The final path becomes: <root>/<markdownFileBaseName>/<randomId>.<ext>",
+          "scope": "application",
+          "markdownDescription": "Firebase Storageのオブジェクトパスのルートフォルダー（例: 'blog-images'）。最終的なパスは `<root>/<markdownFileBaseName>/<randomId>.<ext>` の形式になります。"
+        },
+        "markdownImageUploader.overridePasteInMarkdown": {
+          "type": "boolean",
+          "default": true,
+          "description": "If enabled, overrides Ctrl/Cmd+V in Markdown editors to upload image paths to Firebase and paste as Markdown.",
+          "scope": "application",
+          "markdownDescription": "有効にすると、MarkdownエディタでCtrl/Cmd+Vを押した際に、画像ファイルパスをFirebase StorageにアップロードしてMarkdownリンクとして貼り付けます。"
+        },
+        "markdownImageUploader.firebaseApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Firebase web API key (apiKey).",
+          "scope": "application",
+          "markdownDescription": "Firebase Web APIキー（apiKey）。Firebase Consoleのプロジェクト設定から取得できます。"
+        },
+        "markdownImageUploader.firebaseAuthDomain": {
+          "type": "string",
+          "default": "",
+          "description": "Firebase authDomain (e.g. your-project.firebaseapp.com).",
+          "scope": "application",
+          "markdownDescription": "Firebase認証ドメイン（例: your-project.firebaseapp.com）。Firebase Consoleのプロジェクト設定から取得できます。"
+        },
+        "markdownImageUploader.firebaseProjectId": {
+          "type": "string",
+          "default": "",
+          "description": "Firebase projectId.",
+          "scope": "application",
+          "markdownDescription": "FirebaseプロジェクトID。Firebase Consoleのプロジェクト設定から取得できます。"
+        },
+        "markdownImageUploader.firebaseStorageBucket": {
+          "type": "string",
+          "default": "",
+          "description": "Firebase storageBucket (e.g. your-project.appspot.com).",
+          "scope": "application",
+          "markdownDescription": "Firebase Storageバケット名（例: your-project.appspot.com）。Firebase ConsoleのStorage設定から取得できます。"
+        },
+        "markdownImageUploader.firebaseAppId": {
+          "type": "string",
+          "default": "",
+          "description": "Firebase appId (optional but recommended).",
+          "scope": "application",
+          "markdownDescription": "Firebase App ID（オプションですが推奨）。Firebase Consoleのプロジェクト設定から取得できます。"
+        },
+        "markdownImageUploader.authEmail": {
+          "type": "string",
+          "default": "",
+          "description": "Firebase Auth email (optional). If set with password, the extension signs in before uploading.",
+          "scope": "application",
+          "markdownDescription": "Firebase認証用のメールアドレス（オプション）。パスワードと一緒に設定すると、アップロード前にこのアカウントでサインインします。"
+        },
+        "markdownImageUploader.authPassword": {
+          "type": "string",
+          "default": "",
+          "description": "Firebase Auth password (optional).",
+          "scope": "application",
+          "markdownDescription": "Firebase認証用のパスワード（オプション）。メールアドレスと一緒に設定すると、アップロード前にこのアカウントでサインインします。"
+        },
+        "markdownImageUploader.useAnonymousAuth": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true (default) and no email/password provided, the extension attempts anonymous auth before uploading.",
+          "scope": "application",
+          "markdownDescription": "true（デフォルト）の場合、メール/パスワードが設定されていない場合、アップロード前に匿名認証を試みます。"
+        },
+        "markdownImageUploader.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable verbose logs in the Output panel (Markdown Image Uploader).",
+          "scope": "application",
+          "markdownDescription": "詳細なログをOutputパネル（Markdown Image Uploader）に表示します。"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "markdownImageUploader.paste",
+        "key": "ctrl+v",
+        "mac": "cmd+v",
+        "when": "editorTextFocus && editorLangId == 'markdown' && markdownImageUploader.overridePaste"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -w -p .",
+    "package": "npx @vscode/vsce package",
+    "lint": "tsc -p . --noEmit"
+  },
+  "dependencies": {
+    "firebase": "^10.12.5",
+    "nanoid": "^5.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.2.2",
+    "typescript": "^5.6.3"
+  }
+}
