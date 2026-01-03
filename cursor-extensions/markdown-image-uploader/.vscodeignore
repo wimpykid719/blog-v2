@@ -1,0 +1,17 @@
+**/.vscode/**
+**/src/**
+**/*.map
+**/tsconfig.json
+**/*.ts
+**/node_modules/**/.bin/**
+**/node_modules/**/test/**
+**/node_modules/**/tests/**
+**/node_modules/**/__tests__/**
+**/node_modules/**/docs/**
+**/node_modules/**/doc/**
+**/node_modules/**/example/**
+**/node_modules/**/examples/**
+**/node_modules/**/coverage/**
+**/node_modules/**/.cache/**
+
+

@@ -40,3 +40,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# cursor extensions
+cursor-extensions/**/node_modules
+cursor-extensions/**/dist
+cursor-extensions/**/.pnp
+cursor-extensions/**/.pnp.*
+cursor-extensions/**/.yarn
+cursor-extensions/**/.yarn/*
+cursor-extensions/**/.yarn/patches
+cursor-extensions/**/.yarn/plugins
+cursor-extensions/**/.yarn/releases
+cursor-extensions/**/.yarn/versions
+*.vsix
