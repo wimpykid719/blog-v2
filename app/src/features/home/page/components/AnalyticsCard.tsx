@@ -29,16 +29,6 @@ export async function AnalyticsCard() {
           <p className="text-[11px] text-amber-900/90 dark:text-amber-100 font-semibold">
             {data.message}
           </p>
-          <div className="mt-2 text-[10px] text-amber-900/80 dark:text-amber-100/90">
-            <p className="font-semibold">必要な環境変数</p>
-            <ul className="mt-1 list-disc pl-4 space-y-0.5">
-              {data.requiredEnv.map((k) => (
-                <li key={k}>
-                  <code className="font-mono">{k}</code>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       ) : (
         <div className="space-y-4">

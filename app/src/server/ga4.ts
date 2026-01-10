@@ -22,7 +22,6 @@ type DisabledData = {
   enabled: false;
   reason: "missing_env" | "error";
   message: string;
-  requiredEnv: string[];
 };
 
 export type Ga4DashboardData = EnabledData | DisabledData;
@@ -47,7 +46,6 @@ function getRequiredEnv() {
   const missing = requiredEnv.filter((k) => !readEnvTrim(k));
 
   return {
-    requiredEnv,
     missing,
     propertyId,
     clientEmail,
@@ -79,22 +77,31 @@ function normalizeArticleSlugFromPath(
   if (!clean.startsWith("/articles/")) return null;
   const rest = clean.slice("/articles/".length);
   const seg = rest.split("/")[0] ?? "";
-  const slug = seg ? decodeURIComponent(seg) : "";
+  let slug = "";
+  if (seg) {
+    try {
+      slug = decodeURIComponent(seg);
+    } catch {
+      return null;
+    }
+  }
   if (!slug) return null;
   return { path: clean, slug };
 }
 
 async function fetchGa4Dashboard(): Promise<Ga4DashboardData> {
-  const { requiredEnv, missing, propertyId, clientEmail, privateKey } =
-    getRequiredEnv();
+  const { missing, propertyId, clientEmail, privateKey } = getRequiredEnv();
 
   if (missing.length > 0) {
+    // ユーザーに環境変数名などの詳細を返さない（情報露出を避ける）
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("GA4 Data API is not configured. Missing env:", missing);
+    }
     return {
       enabled: false,
       reason: "missing_env",
       message:
         "GA4 Data API（Analytics Dashboard）は未設定です。環境変数を設定すると、ページビューと人気ページを表示できます。",
-      requiredEnv,
     };
   }
 
@@ -183,13 +190,16 @@ async function fetchGa4Dashboard(): Promise<Ga4DashboardData> {
       updatedAtIso: new Date().toISOString(),
     };
   } catch (error) {
-    console.error("fetchGa4Dashboard error", error);
+    // 例外詳細をそのままユーザーに返さない。ログも過剰な情報露出を避ける。
+    const errMsg =
+      error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : String(error);
+    console.error("fetchGa4Dashboard error:", errMsg);
     return {
       enabled: false,
       reason: "error",
-      message:
-        "GA4 Data APIの取得に失敗しました（権限/プロパティID/鍵の形式などを確認してください）。",
-      requiredEnv,
+      message: "分析データの取得に失敗しました。",
     };
   }
 }
