@@ -1,7 +1,6 @@
 services:
   nextjs:
     environment:
-      TZ: Asia/Tokyo
       COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
       GIT_USER_NAME: ${GIT_USER_NAME}
       GIT_USER_EMAIL: ${GIT_USER_EMAIL}

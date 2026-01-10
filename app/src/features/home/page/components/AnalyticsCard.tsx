@@ -56,7 +56,10 @@ export async function AnalyticsCard() {
                 人気の記事（Top {data.topArticles.length}）
               </p>
               <span className="text-[10px] text-gray-400">
-                更新: {new Date(data.updatedAtIso).toLocaleString("ja-JP")}
+                更新:{" "}
+                {new Date(data.updatedAtIso).toLocaleString("ja-JP", {
+                  timeZone: "Asia/Tokyo",
+                })}
               </span>
             </div>
 
