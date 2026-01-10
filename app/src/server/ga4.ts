@@ -101,7 +101,7 @@ async function fetchGa4Dashboard(): Promise<Ga4DashboardData> {
       enabled: false,
       reason: "missing_env",
       message:
-        "GA4 Data API（Analytics Dashboard）は未設定です。環境変数を設定すると、ページビューと人気ページを表示できます。",
+        "GA4 Data API（Analytics Dashboard）は未設定です。設定すると、ページビューと人気ページを表示できます。",
     };
   }
 
