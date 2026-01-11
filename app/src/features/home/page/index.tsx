@@ -1,3 +1,4 @@
+import { AnalyticsCard } from "./components/AnalyticsCard";
 import { AutoSnakeGame } from "./components/AutoSnakeGame";
 import { BlogCard } from "./components/BlogCard";
 import { ProfileCard } from "./components/ProfileCard";
@@ -15,6 +16,7 @@ export function HomePage() {
       <div className="space-y-6">
         <ProfileCard />
         <SkillsCard />
+        <AnalyticsCard />
         <BlogCard />
       </div>
     </>

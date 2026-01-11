@@ -129,6 +129,11 @@ GITHUB_REPOS='["zenn-content","qiita-content"]'
 ### 任意
 
 - **`NEXT_PUBLIC_GA4_MEASUREMENT_ID`**: GA4測定ID（設定時のみ計測スクリプトを挿入）
+- **GA4 Data API（任意）**: ホームの「Analytics Dashboard（PV/人気ページ）」表示に使用
+  - **`GA4_PROPERTY_ID`**: GA4のプロパティID（数値。例: `123456789`）
+  - **`GA4_CLIENT_EMAIL`**: サービスアカウントの `client_email`
+  - **`GA4_PRIVATE_KEY`**: サービスアカウントの `private_key`（改行を含む場合は `\n` でも可）
+  - 事前に **Google Analytics（GA4）側でサービスアカウントに閲覧権限以上**を付与してください
 - **`NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`**: Google Search Console 用 verification
 - **`ZENN_USER_NAME`**, **`QIITA_USER_NAME`**: 原本canonical（Zenn/Qiita）生成に使用（`site.json` でも設定可）
 - **GitHub記事ソース**: `GITHUB_REPOS`, `GITHUB_BLOG_PATH`, `GITHUB_TOKEN`, `GITHUB_OWNER`
@@ -167,7 +172,7 @@ GITHUB_REPOS='["zenn-content","qiita-content"]'
 
 3. **GitHub記事ソースの設定（任意）**
    このプロジェクトは、GitHubリポジトリに保存されたMarkdownファイルから `/articles` ページを生成できます。
-   
+
    `.devcontainer/.env` に以下の変数を設定してください（`.devcontainer/.env.sample` からコピー後）：
    - `GITHUB_REPOS`（必須；推奨フォーマット: `owner/repo-a,owner/repo-b`）
    - `GITHUB_OWNER`（必須；リポジトリパス用）

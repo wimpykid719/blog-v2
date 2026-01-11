@@ -9,7 +9,7 @@
     "age": 30,
     "projectsCount": 5,
     "hourlyRate": "3500~",
-    "bio": "1万社が利用する採用管理システムや、1日1,600万件超の高トラフィック環境、0→1のサービス立ち上げに携わってきました。要件定義から運用・保守まで対応可能。上記経験を活かしたWeb制作・簡易Webアプリ開発の依頼を探しています。"
+    "bio": "1万社が利用する採用管理システム、1日1,600万件の高トラフィックシステム、0→1のサービス立ち上げに携わってきました。要件定義・機能開発・QA・運用・保守まで対応可能。Web制作・簡易Webアプリ開発の依頼を承っています。"
   },
   "platforms": {
     "zenn": {
@@ -25,12 +25,12 @@
     "website": ""
   },
   "skills": [
-    "Linux",
-    "MacOS",
     "React",
     "Ruby on Rails",
     "RSpec",
+    "Ruby",
     "PostgreSQL",
+    "MySQL",
     "Docker",
     "Devcontainer",
     "Python",
@@ -58,10 +58,12 @@
     "Claude Code",
     "GitHub Actions",
     "Google Cloud Functions",
-    "Firebase FireStore",
+    "Firebase Firestore",
     "Firebase Storage",
     "Firebase App Hosting",
     "Firebase Authentication",
-    "Vercel"
+    "Vercel",
+    "Linux",
+    "MacOS"
   ]
 }
