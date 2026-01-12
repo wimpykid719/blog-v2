@@ -60,8 +60,15 @@ function MarkdownImage({ src, alt }: { src: string; alt?: string }) {
 export function MarkdownContent({ content }: MarkdownContentProps) {
   const components: Components = {
     code({ node, className, children, ...props }) {
-      const inline =
-        "inline" in props ? (props as { inline: boolean }).inline : false;
+      // react-markdownのバージョンや型の差異で inline が渡ってこないケースがあるため、
+      // 改行有無でブロック/インラインをフォールバック判定する。
+      const rawText = String(children ?? "");
+      const inlineProp =
+        "inline" in props
+          ? (props as unknown as { inline?: boolean }).inline
+          : undefined;
+      const isInline =
+        typeof inlineProp === "boolean" ? inlineProp : !rawText.includes("\n");
       // メタデータから言語とファイルパスを取得
       const meta = (node?.data as { meta?: string })?.meta || "";
       const classNameMatch = /language-(\w+)/.exec(className || "");
@@ -91,28 +98,36 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
         }
       }
 
-      if (!inline && language) {
+      // fenced code block (``` ... ```). 言語指定がなくても <pre> で包んで改行/インデントを保持する。
+      if (!isInline) {
+        const showHeader = Boolean(language || filePath);
         return (
-          <div className="my-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-            {/* ヘッダー部分（言語名とファイルパス） */}
-            <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                  {language}
-                </span>
-                {filePath && (
-                  <>
-                    <span className="text-gray-400 dark:text-gray-500">/</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                      {filePath}
+          <div className="not-prose my-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            {showHeader && (
+              <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2 min-w-0">
+                  {language && (
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                      {language}
                     </span>
-                  </>
-                )}
+                  )}
+                  {filePath && (
+                    <>
+                      {language && (
+                        <span className="text-gray-400 dark:text-gray-500">
+                          /
+                        </span>
+                      )}
+                      <span className="text-xs text-gray-500 dark:text-gray-400 font-mono truncate">
+                        {filePath}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-            {/* コード部分 */}
-            <pre className="m-0 overflow-x-auto bg-gray-50 dark:bg-gray-900">
-              <code className={className} {...props}>
+            )}
+            <pre className="m-0 overflow-x-auto bg-gray-50 dark:bg-gray-900 whitespace-pre text-sm leading-relaxed">
+              <code className={className ? className : "font-mono"} {...props}>
                 {children}
               </code>
             </pre>

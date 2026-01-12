@@ -45,10 +45,7 @@ export function ArticleDetailPage({
       </div>
 
       {/* 記事コンテンツ */}
-      <div className="prose prose-lg max-w-none">
-        <MarkdownContent content={content} />
-      </div>
+      <MarkdownContent content={content} />
     </article>
   );
 }
-
