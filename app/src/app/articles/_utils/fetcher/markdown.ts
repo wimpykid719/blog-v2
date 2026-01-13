@@ -169,6 +169,9 @@ async function getGithubMarkdownFileContent(
     cfg.token,
   );
   if (!res.ok) {
+    console.error(
+      `GitHub contents fetch failed (${res.status}): ${res.message} repo: ${repo.owner}/${repo.repo} filePath: ${filePath}`,
+    );
     if (res.status === 404) return null;
     // それ以外はエラーとして扱う（呼び出し側でフォールバック可能）
     throw new Error(
@@ -222,6 +225,9 @@ async function getAllArticleIndexInternalUncached(): Promise<
           >(url.toString(), github.token);
           if (!res.ok) {
             // リポジトリ単位で失敗しても全体は壊さない
+            console.error(
+              `GitHub contents fetch failed (${res.status}): ${res.message}`,
+            );
             return [] as ArticleIndexItemInternal[];
           }
 
@@ -229,6 +235,7 @@ async function getAllArticleIndexInternalUncached(): Promise<
           const markdownFiles = entries.filter(
             (e) => e.type === "file" && e.name.toLowerCase().endsWith(".md"),
           );
+          console.info("markdownFiles", `${markdownFiles.length} files found`);
 
           const items = await Promise.all(
             markdownFiles.map(async (f) => {
