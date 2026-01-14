@@ -136,8 +136,13 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
         );
       }
 
+      // インラインコードの場合、classNameが存在しない場合はデフォルトスタイルを適用
+      const codeClassName = className
+        ? className
+        : "bg-gray-300 text-gray-900 dark:text-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono";
+
       return (
-        <code className={className} {...props}>
+        <code className={codeClassName} {...props}>
           {children}
         </code>
       );
