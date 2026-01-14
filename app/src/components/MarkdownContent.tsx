@@ -6,6 +6,7 @@ import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
+import remarkBreaks from "remark-breaks";
 import remarkCodeMeta from "remark-code-meta";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -286,7 +287,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
   return (
     <div className="prose prose-lg max-w-none dark:prose-invert">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath, remarkCodeMeta]}
+        remarkPlugins={[remarkGfm, remarkMath, remarkCodeMeta, remarkBreaks]}
         rehypePlugins={[rehypeKatex, rehypeHighlight]}
         components={components}
       >

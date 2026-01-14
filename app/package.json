@@ -21,6 +21,7 @@
     "recharts": "3.6.0",
     "rehype-highlight": "7.0.2",
     "rehype-katex": "7.0.1",
+    "remark-breaks": "4.0.0",
     "remark-code-meta": "0.4.1",
     "remark-gfm": "4.0.1",
     "remark-math": "6.0.0"
