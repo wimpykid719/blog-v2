@@ -15,6 +15,185 @@ interface MarkdownContentProps {
   content: string;
 }
 
+function parseYouTubeVideoId(
+  inputHref: string,
+): { videoId: string; start?: number } | null {
+  if (!inputHref) return null;
+
+  // "www.youtube.com/..." のようなプロトコル省略にも対応
+  const normalizedHref =
+    inputHref.startsWith("http://") || inputHref.startsWith("https://")
+      ? inputHref
+      : `https://${inputHref}`;
+
+  let url: URL;
+  try {
+    url = new URL(normalizedHref);
+  } catch {
+    return null;
+  }
+
+  const host = url.hostname.toLowerCase();
+  const isYouTubeHost =
+    host === "youtu.be" ||
+    host.endsWith(".youtu.be") ||
+    host === "youtube.com" ||
+    host.endsWith(".youtube.com");
+
+  if (!isYouTubeHost) return null;
+
+  // videoId 抽出
+  let videoId = "";
+  const pathname = url.pathname || "";
+
+  if (host === "youtu.be" || host.endsWith(".youtu.be")) {
+    // https://youtu.be/{id}
+    videoId = pathname.replace(/^\/+/, "").split("/")[0] || "";
+  } else if (pathname.startsWith("/watch")) {
+    // https://www.youtube.com/watch?v={id}
+    videoId = url.searchParams.get("v") || "";
+  } else if (pathname.startsWith("/shorts/")) {
+    // https://www.youtube.com/shorts/{id}
+    videoId = pathname.split("/")[2] || "";
+  } else if (pathname.startsWith("/embed/")) {
+    // https://www.youtube.com/embed/{id}
+    videoId = pathname.split("/")[2] || "";
+  } else {
+    // 念のため v パラメータも拾う
+    videoId = url.searchParams.get("v") || "";
+  }
+
+  videoId = videoId.trim();
+  if (!videoId) return null;
+
+  // start 秒（t=1m30s / t=90 / start=90 を軽く対応）
+  const t = (
+    url.searchParams.get("t") ||
+    url.searchParams.get("start") ||
+    ""
+  ).trim();
+  let start: number | undefined;
+  if (t) {
+    const asNumber = Number(t);
+    if (!Number.isNaN(asNumber) && Number.isFinite(asNumber) && asNumber > 0) {
+      start = Math.floor(asNumber);
+    } else {
+      // 1h2m3s / 2m10s / 30s
+      const match = /^((\d+)h)?((\d+)m)?((\d+)s)?$/i.exec(t);
+      if (match) {
+        const h = match[2] ? Number(match[2]) : 0;
+        const m = match[4] ? Number(match[4]) : 0;
+        const s = match[6] ? Number(match[6]) : 0;
+        const total = h * 3600 + m * 60 + s;
+        if (total > 0) start = total;
+      }
+    }
+  }
+
+  return { videoId, start };
+}
+
+type HastLikeNode = {
+  type?: unknown;
+  tagName?: unknown;
+  value?: unknown;
+  children?: unknown;
+  properties?: unknown;
+};
+
+function isWhitespaceTextNode(node: HastLikeNode): boolean {
+  return (
+    node.type === "text" &&
+    typeof node.value === "string" &&
+    node.value.trim() === ""
+  );
+}
+
+function getYouTubeFromParagraphNode(
+  node: unknown,
+): { href: string; videoId: string; start?: number } | null {
+  const n = (node ?? {}) as HastLikeNode;
+  if (n.type !== "element" || n.tagName !== "p") return null;
+
+  const rawChildren = Array.isArray(n.children)
+    ? (n.children as HastLikeNode[])
+    : [];
+  const meaningfulChildren = rawChildren.filter(
+    (c) => !isWhitespaceTextNode(c),
+  );
+
+  // 段落の中身がリンク単体（空白以外は <a> 1つ）のときだけ embed にする
+  if (meaningfulChildren.length !== 1) return null;
+  const only = meaningfulChildren[0];
+  if (!only) return null;
+  if (only.type !== "element" || only.tagName !== "a") return null;
+
+  const props = (only.properties ?? {}) as { href?: unknown };
+  const href = typeof props.href === "string" ? props.href : "";
+  if (!href) return null;
+
+  const yt = parseYouTubeVideoId(href);
+  if (!yt) return null;
+
+  // 参考: リンクテキストも取得できる（必要なら条件に使える）
+  // const text = extractTextFromHast(only).trim();
+
+  return { href, videoId: yt.videoId, start: yt.start };
+}
+
+function YouTubeEmbedCard({
+  href,
+  videoId,
+  start,
+}: {
+  href: string;
+  videoId: string;
+  start?: number;
+}) {
+  const src = React.useMemo(() => {
+    const u = new URL(`https://www.youtube.com/embed/${videoId}`);
+    // 余計なトラッキングを避けたい場合は youtube-nocookie.com も検討できるが、
+    // まずは互換性重視で通常ドメインに寄せる
+    u.searchParams.set("rel", "0");
+    u.searchParams.set("modestbranding", "1");
+    if (typeof start === "number" && start > 0) {
+      u.searchParams.set("start", String(start));
+    }
+    return u.toString();
+  }, [videoId, start]);
+
+  return (
+    <div className="my-6 not-prose">
+      <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm">
+        <div
+          className="relative w-full bg-black"
+          style={{ aspectRatio: "16 / 9" }}
+        >
+          <iframe
+            className="absolute inset-0 w-full h-full"
+            src={src}
+            title="YouTube embed"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        </div>
+        <div className="px-4 py-3">
+          <a
+            href={href}
+            className="text-sm text-blue-600 dark:text-blue-400 hover:underline wrap-break-word"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            YouTubeで開く
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MarkdownImage({ src, alt }: { src: string; alt?: string }) {
   // 初期表示は 16:9 を仮に使い、読み込み後に実画像の縦横比へ更新して
   // デスクトップでも「本文と同じ横幅」で自然に表示されるようにする。
@@ -170,7 +349,18 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
         {children}
       </h4>
     ),
-    p: ({ children }) => {
+    p: ({ node, children }) => {
+      const yt = getYouTubeFromParagraphNode(node);
+      if (yt) {
+        return (
+          <YouTubeEmbedCard
+            href={yt.href}
+            videoId={yt.videoId}
+            start={yt.start}
+          />
+        );
+      }
+
       // 子要素にdiv要素やmarkdown-image-wrapperクラスが含まれている場合は、<p>の代わりに<div>を使用
       // (imgコンポーネントが<div>を返すため、<p>の中に<div>を配置できない)
       const checkForBlockElement = (child: React.ReactNode): boolean => {
