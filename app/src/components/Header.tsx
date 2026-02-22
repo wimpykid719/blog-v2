@@ -1,6 +1,6 @@
 "use client";
 
-import { Rss, X } from "lucide-react";
+import { Building2, Rss, SquarePen, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { NotificationBadge } from "@/components/NotificationBadge";
@@ -108,6 +108,30 @@ export function Header({ maxWidth = "md" }: HeaderProps) {
               >
                 <Rss className="w-5 h-5" />
                 <span>RSSフィード</span>
+              </Link>
+              <Link
+                href="/articles"
+                target="_blank"
+                onClick={handleLinkClick}
+                className={`
+                  flex items-center gap-3 h-10 px-3 rounded-md transition-colors
+                  text-neutral-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-gray-700 hover:text-neutral-900 dark:hover:text-white
+                `}
+              >
+                <SquarePen className="w-5 h-5" />
+                <span>技術ブログ</span>
+              </Link>
+              <Link
+                href="https://employee-counter-ten.vercel.app"
+                target="_blank"
+                onClick={handleLinkClick}
+                className={`
+                  flex items-center gap-3 h-10 px-3 rounded-md transition-colors
+                  text-neutral-700 dark:text-gray-300 hover:bg-neutral-100 dark:hover:bg-gray-700 hover:text-neutral-900 dark:hover:text-white
+                `}
+              >
+                <Building2 className="w-5 h-5" />
+                <span>正社員カウンター</span>
               </Link>
             </li>
           </ul>
