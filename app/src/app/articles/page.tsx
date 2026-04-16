@@ -63,7 +63,7 @@ export default async function ArticlesPage({
 
         {/* ページネーション */}
         {index.length > 0 && (
-          <section className="max-w-6xl mx-auto px-6 mt-12">
+          <section className="max-w-6xl mx-auto px-6 my-12">
             <Pagination
               path="/articles?page="
               page={currentPage}

@@ -14,7 +14,7 @@ export function ArticleDetailPage({
   const { frontMatter, content } = article;
 
   return (
-    <article className="max-w-4xl mx-auto px-6 mt-8">
+    <article className="max-w-4xl mx-auto px-6 my-8">
       {/* タイトル */}
       <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
         {frontMatter.title}
