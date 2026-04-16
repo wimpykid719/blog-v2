@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import {
   buildArticleDescription,
   getAppPageUrl,
@@ -21,9 +22,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <Header maxWidth="6xl" />
-      <ArticleDetailContainer slug={slug} />
+      <div className="flex-1">
+        <ArticleDetailContainer slug={slug} />
+      </div>
+      <Footer maxWidth="6xl" />
     </div>
   );
 }
