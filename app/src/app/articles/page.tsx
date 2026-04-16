@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import Pagination from "@/components/Pagination";
 import { ArticlesContainer } from "./_container/Container";
 import { getAllArticleIndex } from "./_utils/fetcher/markdown";
@@ -54,22 +55,26 @@ export default async function ArticlesPage({
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <Header maxWidth="6xl" />
 
-      <ArticlesContainer index={pagedIndex} />
+      <div className="flex-1">
+        <ArticlesContainer index={pagedIndex} />
 
-      {/* ページネーション */}
-      {index.length > 0 && (
-        <section className="max-w-6xl mx-auto px-6 mt-12">
-          <Pagination
-            path="/articles?page="
-            page={currentPage}
-            lastPage={lastPage}
-            siblingCount={2}
-          />
-        </section>
-      )}
+        {/* ページネーション */}
+        {index.length > 0 && (
+          <section className="max-w-6xl mx-auto px-6 mt-12">
+            <Pagination
+              path="/articles?page="
+              page={currentPage}
+              lastPage={lastPage}
+              siblingCount={2}
+            />
+          </section>
+        )}
+      </div>
+
+      <Footer maxWidth="6xl" />
     </div>
   );
 }
